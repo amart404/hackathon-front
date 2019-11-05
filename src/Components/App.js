@@ -9,7 +9,9 @@ export default class App extends Component {
   state = {
     number: 0,
     factType: 'trivia',
-    fact: ''
+    fact: '',
+    showInput: true,
+    showTrivia: false
   }
 
   componentDidMount() {
@@ -29,16 +31,21 @@ export default class App extends Component {
   }
 
   getFact = () => {
-
     const URL = `http://numbersapi.com/${this.state.number}/${this.state.factType}`
 
     fetch(URL)
-      .then(resp => resp.json())
+      .then(resp => resp.text())
       .then(fact => {
         this.setState({
           fact
         })
       })
+
+    this.setState({
+      showInput: false,
+      showTrivia: true
+    })
+
   }
 
   postFact = () => {
@@ -51,15 +58,24 @@ export default class App extends Component {
       },
       body: JSON.stringify({number: this.state.number, type: this.state.factType})
     })
-      .then(resp => resp.json())
+
+    this.setState({
+      showInput: true,
+      showTrivia: false
+    })
+
   }
   
   render() {
     return (
       <div className="App">
         <Header />
-        <NumberForm getFact={this.getFact} getNumber={this.getNumber} changeRadio={this.changeRadio}/>
-        <TriviaBox fact={this.state.fact} postFact={this.postFact}/>
+        { this.state.showInput &&
+          <NumberForm getFact={this.getFact} getNumber={this.getNumber} changeRadio={this.changeRadio}/>
+        }
+        {this.state.showTrivia &&
+          <TriviaBox fact={this.state.fact} postFact={this.postFact}/>
+        }
       </div>
     );
   }
